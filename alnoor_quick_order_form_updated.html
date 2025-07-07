@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quick Order – Al-Noor Store</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fff8f2;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header img {
+      width: 140px;
+    }
+    h1 {
+      margin: 10px 0 5px;
+      color: #9C5700;
+    }
+    p.slogan {
+      color: #F58A07;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    hr {
+      border: none;
+      border-top: 2px solid #f58a07;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+    fieldset {
+      border: 2px solid #F58A07;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+    legend {
+      padding: 0 10px;
+      font-weight: bold;
+      color: #9C5700;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: 500;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    input[readonly] {
+      background-color: #f2f2f2;
+    }
+    .quantity-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .quantity-control button {
+      width: 32px;
+      height: 32px;
+      font-size: 18px;
+      border: none;
+      background-color: #F58A07;
+      color: white;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .quantity-control input {
+      text-align: center;
+      font-weight: bold;
+    }
+    .radio-option label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .button-submit {
+      background-color: #28a745;
+      color: white;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      width: 100%;
+      cursor: pointer;
+    }
+    .button-submit:hover {
+      background-color: #218838;
+    }
+    .product-summary {
+      background-color: #fff0e0;
+      padding: 10px;
+      border-left: 4px solid #F58A07;
+      margin-bottom: 15px;
+    }
+  </style>
+  <script>
+    function updateTotal() {
+      const price = parseFloat(document.getElementById("unitPrice").value) || 0;
+      const qty = parseInt(document.getElementById("quantity").value) || 1;
+      document.getElementById("totalPrice").value = "PKR " + (price * qty);
+      document.getElementById("hiddenTotal").value = price * qty;
+    }
+
+    function adjustQty(change) {
+      let qty = parseInt(document.getElementById("quantity").value) || 1;
+      qty += change;
+      if (qty < 1) qty = 1;
+      document.getElementById("quantity").value = qty;
+      updateTotal();
+    }
+
+    window.onload = function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const name = urlParams.get('product_name') || '';
+      const price = urlParams.get('product_price') || '';
+      const pid = urlParams.get('product_id') || '';
+      const img = urlParams.get('product_image') || '';
+
+      document.getElementById("productName").value = name;
+      document.getElementById("unitPrice").value = price;
+      document.getElementById("productId").value = pid;
+      document.getElementById("productImage").value = img;
+      updateTotal();
+
+      if (name || price) {
+        document.getElementById("product-summary").innerHTML = `
+          ${img ? `<img src="${img}" alt="Product Image" style="width:100%; max-height:200px; object-fit:cover; margin-bottom:10px;">` : ""}
+          <strong>You are ordering:</strong><br/>
+          Product: ${name} <br/>
+          Unit Price: PKR ${price}
+        `;
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="https://i.ibb.co/yFHHyXTk/In-Shot-20250705-212327976.webp" alt="Al-Noor Store Logo" />
+      <h1>QUICK ORDER</h1>
+      <p class="slogan">Bringing Light to Your Life!</p>
+      <hr>
+    </div>
+    <div class="product-summary" id="product-summary"></div>
+    <form action="https://osrolxzvnurzisusv.supabase.co/functions/v1/submit-form" method="POST">
+      <fieldset>
+        <legend>Product Details</legend>
+        <label>Product Name:</label>
+        <input type="text" id="productName" name="product_name" readonly>
+
+        <label>Unit Price (Total shown below):</label>
+        <input type="text" id="unitPrice" readonly>
+
+        <label>Quantity:</label>
+        <div class="quantity-control">
+          <button type="button" onclick="adjustQty(-1)">−</button>
+          <input type="text" id="quantity" name="quantity" value="1" readonly>
+          <button type="button" onclick="adjustQty(1)">+</button>
+        </div>
+
+        <label>Total Price:</label>
+        <input type="text" id="totalPrice" readonly>
+
+        <input type="hidden" id="hiddenTotal" name="total_price">
+        <input type="hidden" id="productId" name="product_id">
+        <input type="hidden" id="productImage" name="product_image">
+      </fieldset>
+
+      <fieldset>
+        <legend>Your Contact Details</legend>
+        <label>Your Full Name:</label>
+        <input type="text" name="full_name" required>
+
+        <label>Phone Number:</label>
+        <input type="text" name="phone" placeholder="03XX-XXXXXXX" required>
+
+        <label>Email Address (Optional):</label>
+        <input type="email" name="email">
+      </fieldset>
+
+      <fieldset>
+        <legend>Delivery Information</legend>
+        <label>Street Address / House No.:</label>
+        <textarea name="address" rows="3" required></textarea>
+
+        <label>Landmark (Optional):</label>
+        <input type="text" name="landmark" placeholder="Near Main Market">
+
+        <label>City:</label>
+        <input type="text" name="city" required>
+
+        <label>Province/State:</label>
+        <input type="text" name="province" placeholder="Punjab" required>
+      </fieldset>
+
+      <fieldset>
+        <legend>Payment Method</legend>
+        <div class="radio-option">
+          <label><input type="radio" name="payment_method" value="COD" checked> Cash on Delivery (COD)</label>
+          <label><input type="radio" disabled> Online Payment (Coming Soon)</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Additional Notes (Optional)</legend>
+        <textarea name="notes" rows="2" placeholder="Leave at gate if not home, specific time."></textarea>
+      </fieldset>
+
+      <button type="submit" class="button-submit">Place Order Now</button>
+    </form>
+  </div>
+</body>
+</html>

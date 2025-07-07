@@ -1,2 +1,2 @@
-# quick-order-alnoor
-Quick Order Form for Al-Noor Store
+Deploy using GitHub Pages or Vercel. Use this link format:
+?product_name=Hair+Serum&product_price=750
